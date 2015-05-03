@@ -1,37 +1,30 @@
 #!/bin/bash
 
-pwd
-dataFile="servers.list"
+DIR=`dirname $0`
+dataFile=$DIR"/servers.list"
+query=$1
 
 while read line
 do
-    #echo ${line}
     if [ -n "${line}" ]
     then
         echo "--["${line}"]"
-        query=$1
-        #OS分岐
-        #echo "`ssh -n ${line} cat /etc/issue`"
-        #echo "`ssh -n ${line} cat /etc/issue|awk '{if($0~/Cent/){flg=\"centos\"}}END{print flg}'`"
-        #echo "`ssh -n ${line} cat /etc/issue|awk '{if($1&&!flg){flg=$1}}END{print flg}'`"
-        os="`ssh -n ${line} cat /etc/issue|awk '{if($1&&!flg){flg=$1}}END{print flg}'`"
 
-        echo $os
+        #OS分岐
+        os="`ssh -no 'ConnectTimeout 3' ${line} cat /etc/issue|awk '{if($1&&!flg){flg=$1}}END{print flg}'`"
 
         #CentOs
         if test $os == "CentOS"
         then
-            echo "`ssh -n ${line} yum install -y $query`"
-            #echo "centos"
+            echo "`ssh -no 'ConnectTimeout 3' ${line} yum install -y $query`"
         #Debian
         elif test $os == "Debian"
         then
-            echo "`ssh -n ${line} apt-get install -y $query`"
+            echo "`ssh -no 'ConnectTimeout 3' ${line} apt-get install -y $query`"
         #Ubuntu
         elif test $os == "Ubuntu"
         then
-            echo "`ssh -n ${line} apt-get install -y $query`"
-            #echo "ubuntu"
+            echo "`ssh -no 'ConnectTimeout 3' ${line} apt-get install -y $query`"
         fi
     fi
 done<$dataFile

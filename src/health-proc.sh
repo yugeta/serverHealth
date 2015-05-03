@@ -2,13 +2,11 @@
 
 DIR=`dirname $0`
 dataFile=$DIR"/servers.list"
-sh=$1
 
 while read line
 do
     if [ -n "${line}" ]
     then
-        echo "--["${line}"]"
-        echo "`ssh -no 'ConnectTimeout 3' ${line} $sh`"
+        echo ${line}"\t: `ssh -no 'ConnectTimeout 3' ${line} ps -e | wc -l`"
     fi
 done<$dataFile

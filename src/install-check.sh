@@ -1,18 +1,17 @@
 #!/bin/bash
 
-pwd
-dataFile="servers.list"
+DIR=`dirname $0`
+dataFile=$DIR"/servers.list"
+query=$1
 
 while read line
 do
-    #echo ${line}
     if [ -n "${line}" ]
     then
         echo "--["${line}"]"
-        query=$1
-        # echo "`ssh -n ${line} $query --version`"
+        
         #OS分岐
-        os="`ssh -n ${line} cat /etc/issue|awk '{if($1&&!flg){flg=$1}}END{print flg}'`"
+        os="`ssh -no 'ConnectTimeout 3' ${line} cat /etc/issue|awk '{if($1&&!flg){flg=$1}}END{print flg}'`"
 
         #CentOs
         if test $os == "CentOS"
@@ -24,7 +23,7 @@ do
             then
                 query="httpd"
             fi
-            echo "`ssh -n ${line} yum list $query|grep $query`"
+            echo "`ssh -no 'ConnectTimeout 3' ${line} yum list $query|grep $query`"
         #Debian
         elif test $os == "Debian"
         then
@@ -32,7 +31,7 @@ do
             then
                 query="apache2"
             fi
-            echo "`ssh -n ${line} dpkg -l $query|grep $query`"
+            echo "`ssh -no 'ConnectTimeout 3' ${line} dpkg -l $query|grep $query`"
         #Ubuntu
         elif test $os == "Ubuntu"
         then
@@ -40,7 +39,7 @@ do
             then
                 query="apache2"
             fi
-            echo "`ssh -n ${line} dpkg -l $query|grep $query`"
+            echo "`ssh -no 'ConnectTimeout 3' ${line} dpkg -l $query|grep $query`"
         fi
     fi
 done<$dataFile
