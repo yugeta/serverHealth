@@ -7,6 +7,6 @@ while read line
 do
     if [ -n "${line}" ]
     then
-        echo ${line}"\t: `ssh -no 'ConnectTimeout 3' ${line} top -bn 1 | grep 'Cpu(s):' | awk '{gsub(/\%Cpu/,\"Cpu\");gsub(/\%/,\" \");print 100-$8;}'`%"
+        echo ${line}"\t: `ssh -no 'ConnectTimeout 10' ${line} top -bn 1|grep Cpu|awk '{split($0,dat,":");split(dat[2],val,\",\");for(i in val){if(val[i]~\"id\"){print 100-(val[i]*1)\"%\";}}}'`";
     fi
 done<$dataFile
